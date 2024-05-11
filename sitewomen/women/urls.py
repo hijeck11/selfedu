@@ -3,7 +3,7 @@ from . import views
 from . import converters
 
 register_converter(converters.FordigitYearConverter, "year4")
-
+# зарегистрировали конвертер на обрабутку урла archive на 4 цифры
 
 urlpatterns = [
     path('', views.index, name='home'),
