@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ main_title|default:"Без заголовка" }}</title>
+    <title>{{ title }}</title>
 </head>
 <body>
-<p>{{ menu }}</p>
+<ul>
+    <li><a href="{% url 'home' %}">Главная страница</a></li>
+    {% for m in menu %}
+    {% if not forloop.last %}<li>{% else %}<li class="last">{% endif %}
+       <a href="{% url m.url_name %}">{{ m.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
 <h1>{{ title|upper }}</h1>
 
 <ul>
@@ -14,8 +21,9 @@
     <li>
         <h2>{{ p.title }}</h2>
         <p>{{ p.content }}</p>
+        <p><a href="{% url 'post' p.id %}">Читать пост</a></p>
         {% if not forloop.last %}
-        <hr>
+        <hr>  <!-- горизонтальная линия -->
         {% endif %}
     </li>
     {% endif %}

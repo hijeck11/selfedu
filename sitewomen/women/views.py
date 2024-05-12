@@ -3,7 +3,11 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpRespons
 from django.urls import reverse
 from django.template.loader import render_to_string
 
-menu = ['О сайте', 'Добавить статью', 'Обратная связь', 'Ввойти']
+menu = [{'title': "О сайте", 'url_name': 'about'},
+        {'title': "Добавить статью", 'url_name': 'addpage'},
+        {'title': "Обратная связь", 'url_name': 'contact'},
+        {'title': "Ввойти", 'url_name': 'login'}
+]
 
 
 data_db = [
@@ -24,20 +28,17 @@ def index(request):
 def about(request):
     return render(request, 'women/about.html', {'title': 'О сайте'})
 
-def categories(request, cat_id):
-    return HttpResponse(f"<h1>Cтатьи по категориям</h1><p>id: {cat_id}</p>")
+def show_post(request, post_id):
+    return HttpResponse(f'Отображение статьи с id - {post_id}')
 
-def categories_by_slug(request, cat_slug):
-    if request.GET:
-        print(request.GET)
-    return HttpResponse(f"<h1>Cтатьи по категориям</h1><p>slug: {cat_slug}</p>")
+def addpage(request):
+    return HttpResponse('Добавлеине статьи')
 
-def archive(request, year):
-    if year > 2023:
-        uri = reverse('cats', args=('sport', ))
-        return HttpResponsePermanentRedirect(uri)
-    return HttpResponse(f"<h1>Архив по годам</h1><p>{year}</p>")
-# с permanent=True перенаправление ошибка 301, без 302
+def contact(request):
+    return HttpResponse('Обратная связь')
+
+def login(request):
+    return HttpResponse('Авторизация')
 
 def page_not_found(request, exception):
     return HttpResponseNotFound("<h1>Страница не найдена</h1>")
