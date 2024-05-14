@@ -26,7 +26,7 @@ def index(request):
     return render(request, 'women/index.html', context=data)
 
 def about(request):
-    return render(request, 'women/about.html', {'title': 'О сайте'})
+    return render(request, 'women/about.html', {'title': 'О сайте', 'menu': menu})
 
 def show_post(request, post_id):
     return HttpResponse(f'Отображение статьи с id - {post_id}')
