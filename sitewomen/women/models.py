@@ -31,6 +31,9 @@ class Women(models.Model):
 
 
     class Meta:
+        verbose_name = 'Известные женщины'
+        verbose_name_plural = 'Известные женщины'
+        # выше указано имя модели в админ-панели для единственного и множественного числа
         ordering = ['-time_create']
         indexes = [
             models.Index(fields=['-time_create'])
