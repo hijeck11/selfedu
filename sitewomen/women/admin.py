@@ -2,7 +2,22 @@ from django.contrib import admin, messages
 from .models import Women, Category
 
 
-# Register your models here.
+# свой собственный фильтр
+class MarriedFilter(admin.SimpleListFilter):
+    title = 'Статус женщин'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('married', 'Замужем'),
+            ('single', 'Не замужем'),
+        ]
+    def queryset(self, request, queryset):
+        if self.value() == 'married':
+            return queryset.filter(husband__isnull=False)
+        elif self.value() == 'single':
+            return queryset.filter(husband__isnull=True)
+
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
     list_display = ('title', 'time_create', 'is_published', 'cat', 'brief_info')
@@ -15,6 +30,9 @@ class WomenAdmin(admin.ModelAdmin):
     # пагинация в админке
     actions = ['set_published', 'set_draft']
     # активация действий, прописаны ниже функции
+    search_fields = ['title__startswith', 'cat__name']
+    # добовление поиска, cat__name поиск через связанную таблицу(категории)
+    list_filter = [MarriedFilter, 'cat__name', 'is_published']
 
     @admin.display(description="Краткое описание", ordering='content')
     def brief_info(self, women: Women):
