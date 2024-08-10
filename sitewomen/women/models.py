@@ -1,6 +1,8 @@
-from django.urls import reverse
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+
 
 def translit_to_eng(s: str) -> str:
     d = {'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
@@ -10,9 +12,9 @@ def translit_to_eng(s: str) -> str:
          'ш': 'sh', 'щ': 'shch', 'ь': '', 'ы': 'y', 'ъ': '', 'э': 'r', 'ю': 'yu', 'я': 'ya'}
 
     return "".join(map(lambda x: d[x] if d.get(x, False) else x, s.lower()))
-# костыль, чтобы автоматически создать slug если поле title кирилицей - def save
 
-class PublishManager(models.Manager):
+
+class PublishedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_published=Women.Status.PUBLISHED)
 
@@ -21,29 +23,31 @@ class Women(models.Model):
     class Status(models.IntegerChoices):
         DRAFT = 0, 'Черновик'
         PUBLISHED = 1, 'Опубликовано'
-    #Пользовательский менеджер
 
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
-    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='Slug')
-    content = models.TextField(blank=True, verbose_name='Текст статьи')
-    time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
-    time_update = models.DateTimeField(auto_now=True, verbose_name='Время изменения')
-    is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)), default=Status.DRAFT, verbose_name='Статус')
-    # здесь сделан костыль, чтобы в админку передвать булевые значения, а не 0-1
-    cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name='Категории')
-    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Теги')
-    husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, null=True, blank=True, related_name='wuman', verbose_name='Муж')
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug",                           validators=[
+                               MinLengthValidator(5, message="Минимум 5 символов"),
+                               MaxLengthValidator(100, message="Максимум 100 символов"),
+                           ])
+    content = models.TextField(blank=True, verbose_name="Текст статьи")
+    time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
+    time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
+    is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
+                                       default=Status.DRAFT, verbose_name="Статус")
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name="Категории")
+    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name="Теги")
+    husband = models.OneToOneField('Husband', on_delete=models.SET_NULL,
+                                   null=True, blank=True, related_name='wuman', verbose_name="Муж")
 
     objects = models.Manager()
-    published = PublishManager()
+    published = PublishedManager()
+
     def __str__(self):
         return self.title
 
-
     class Meta:
-        verbose_name = 'Известные женщины'
-        verbose_name_plural = 'Известные женщины'
-        # выше указано имя модели в админ-панели для единственного и множественного числа
+        verbose_name = "Известные женщины"
+        verbose_name_plural = "Известные женщины"
         ordering = ['-time_create']
         indexes = [
             models.Index(fields=['-time_create'])
@@ -55,15 +59,15 @@ class Women(models.Model):
     # def save(self, *args, **kwargs):
     #     self.slug = slugify(translit_to_eng(self.title))
     #     super().save(*args, **kwargs)
-# автоматическое создание поля slug если пустое
+
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, db_index=True, verbose_name='Категория')
+    name = models.CharField(max_length=100, db_index=True, verbose_name="Категория")
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
     class Meta:
-        verbose_name = 'Категории'
-        verbose_name_plural = 'Категории'
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
     def __str__(self):
         return self.name
