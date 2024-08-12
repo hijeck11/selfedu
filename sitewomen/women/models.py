@@ -30,7 +30,7 @@ class Women(models.Model):
                                MaxLengthValidator(100, message="Максимум 100 символов"),
                            ])
     photo = models.ImageField(upload_to='photos/%Y/%m/%d/', default=None, blank=True, null=True, verbose_name='Фото')
-    # здесь указал куда загружается фото, сортировка папок по Дате загрузки
+    # 1здесь указал куда загружается фото, сортировка папок по Дате загрузки
     content = models.TextField(blank=True, verbose_name="Текст статьи")
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
