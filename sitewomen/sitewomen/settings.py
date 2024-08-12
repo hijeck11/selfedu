@@ -129,6 +129,7 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = BASE_DIR / 'media'
 # указываем каталог куда будут загружаться все файлы
+MEDIA_URL = '/media/'
 
 
 # Default primary key field type
