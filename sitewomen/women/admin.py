@@ -1,4 +1,6 @@
 from django.contrib import admin, messages
+from django.utils.safestring import mark_safe
+
 from .models import Women, Category
 
 
@@ -21,17 +23,17 @@ class MarriedFilter(admin.SimpleListFilter):
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
     # отображение полей в записи и форме
-    fields = ['title', 'slug', 'content', 'cat', 'husband', 'tags']
+    fields = ['title', 'slug', 'content', 'photo', 'post_photo', 'cat', 'husband', 'tags']
     # exclude = ['tags', 'is_published']
     # отображаются все поля, в указываем какие не отображаем
     prepopulated_fields = {"slug": ("title", )}
-    # readonly_fields = ['slug']
+    readonly_fields = ['post_photo']
     # указываем нередактируемые поля, только для чтения
     # поля не применять если небходимо создавать slug(prepopulated_fields)
     # filter_horizontal = ['tags']
     # отображение тегов в фомре, можно сделать и вертикальлно filter_vertical
     filter_vertical = ['tags']
-    list_display = ('title', 'time_create', 'is_published', 'cat', 'brief_info')
+    list_display = ('title', 'post_photo', 'time_create', 'is_published', 'cat')
     list_display_links = ('title',)
     # делает текст кликабельной ссылкой
     ordering = ['time_create', 'title']
@@ -44,10 +46,15 @@ class WomenAdmin(admin.ModelAdmin):
     search_fields = ['title__startswith', 'cat__name']
     # добовление поиска, cat__name поиск через связанную таблицу(категории)
     list_filter = [MarriedFilter, 'cat__name', 'is_published']
+    save_on_top = True
+    # кнопка сохранить сверху и снизу
 
-    @admin.display(description="Краткое описание", ordering='content')
-    def brief_info(self, women: Women):
-        return f"Описание {len(women.content)} символов."
+    @admin.display(description="Изображение", ordering='content')
+    def post_photo(self, women: Women):
+        if women.photo:
+            return mark_safe(f"<img src='{women.photo.url}' width=50>")
+        return "Без фото"
+    # отображение картинок в админке
 
 
     @admin.display(description="Опубликовать выбранные записи")
