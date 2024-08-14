@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpRespons
 from django.urls import reverse, reverse_lazy
 from django.template.loader import render_to_string
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, CreateView, UpdateView
 
 from .forms import AddPostForm, UploadFileForm
 from .models import Women, Category, TagPost, UploadFiles
@@ -119,20 +119,28 @@ class ShowPost(DetailView):
 #     return render(request, 'women/addpage.html', data)
 
 
-class AddPage(FormView):
+class AddPage(CreateView):
     form_class = AddPostForm
+    # model = Women
+    # fields = '__all__'
     template_name = 'women/addpage.html'
-    success_url = reverse_lazy('home')
+    # success_url = reverse_lazy('home')
     extra_context = {
         'menu': menu,
         'title': 'Добавление статьи',
     }
+# Этот базовый класс включает в себя валидацию, проверку на правильность заполнения формы.
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-# метод на проверку правильности заполнения формы. Только после этого новая запись будет дабавлена в БД
 
+class UpdatePage(UpdateView):
+    model = Women
+    fields = ['title', 'content', 'photo', 'is_published', 'cat']
+    template_name = 'women/addpage.html'
+    success_url = reverse_lazy('home')
+    extra_context = {
+        'menu': menu,
+        'title': 'Редактирование статьи',
+}
 
 # class AddPage(View):
 #     def get(selfs, request):
