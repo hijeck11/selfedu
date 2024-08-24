@@ -1,7 +1,6 @@
 menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Добавить статью", 'url_name': 'addpage'},
         {'title': "Обратная связь", 'url_name': 'contact'},
-        {'title': "Ввойти", 'url_name': 'login'}
 ]
 
 class DataMixin:
@@ -19,11 +18,7 @@ class DataMixin:
             self.extra_context['cat_selected'] = self.cat_selected
 
 
-        if 'menu' not in self.extra_context:
-            self.extra_context['menu'] = menu
-
     def get_mixin_context(self, context, **kwargs):
-        context['menu'] = menu
         context['cat_selected'] = None
         context.update(kwargs)
         return context
