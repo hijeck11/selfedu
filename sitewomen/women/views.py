@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -20,7 +22,8 @@ class WomenHome(DataMixin, ListView):
     def get_queryset(self):
         return Women.published.all().select_related('cat')
 
-
+@login_required
+# (login_url='/admin') можно указывать куда перенаправлять если не авторизован
 def about(request):
     contact_list = Women.published.all()
     paginator = Paginator(contact_list, 3)
@@ -45,12 +48,19 @@ class ShowPost(DataMixin, DetailView):
 #С этой функицией отображаются только опубликованные посты.
 
 
-class AddPage(DataMixin, CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+    # LoginRequiredMixin - делаем запрет для неавторизованнных пользователей
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title_page = 'Добавление статьи'
+    # login_url = '/admin/' - адрес перенаправления неавторизованных пользователей
 # Этот базовый класс включает в себя валидацию, проверку на правильность заполнения формы.
 
+    def form_valid(self, form):
+        w = form.save(commit=False)
+        w.author = self.request.user
+        return super().form_valid(form)
+#     это фонкция автоматически присваивает имя автора статьи(поле author в модели women)
 
 class UpdatePage(DataMixin, UpdateView):
     model = Women

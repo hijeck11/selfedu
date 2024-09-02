@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 # адрес куда необходимо отпрвить пользователя после входа
 
-# LOGIN_URL =
+LOGIN_URL = 'users:login'
 # определяет URL адорес, на который следует перенаправить неавторизованного пользователя
 # при попытке посетить закрытую страницу
 
