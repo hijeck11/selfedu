@@ -148,3 +148,8 @@ LOGIN_URL = 'users:login'
 
 LOGOUT_REFIRECT_URL = 'home'
 # задает URL  адрес, на который перенаправляется пользователь после входа.
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.authentication.EmailAuthBackends',
+]
