@@ -22,7 +22,7 @@
 {% endfor %}
 <!--ниже сделано отображение входа/выхода и рестирации в меню-->
 {% if user.is_authenticated %}
-				<li class="last"> {{user.username}}  |  <a href="{% url 'users:logout' %}">Выйти</a></li>
+				<li class="last"><a href="{% url 'users:profile' %}">{{user.username}}</a>  |  <a href="{% url 'users:logout' %}">Выйти</a></li>
 {% else %}
 	<li class="last"><a href="{% url 'users:login' %}">Ввойти</a>  |  <a href="{% url 'users:register' %}">Регистрация</a></li>
 {% endif %}
