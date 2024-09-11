@@ -1,5 +1,5 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -48,13 +48,16 @@ class ShowPost(DataMixin, DetailView):
 #С этой функицией отображаются только опубликованные посты.
 
 
-class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+class AddPage(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView):
     # LoginRequiredMixin - делаем запрет для неавторизованнных пользователей
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title_page = 'Добавление статьи'
     # login_url = '/admin/' - адрес перенаправления неавторизованных пользователей
 # Этот базовый класс включает в себя валидацию, проверку на правильность заполнения формы.
+    permission_required = 'women.add_women'
+    # permission_required- указываем разрешения, в данном случае пеорвле это приложение, затем действи add(добавить)
+    # и указываем куда -> таблица women
 
     def form_valid(self, form):
         w = form.save(commit=False)
@@ -62,14 +65,20 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         return super().form_valid(form)
 #     это фонкция автоматически присваивает имя автора статьи(поле author в модели women)
 
-class UpdatePage(DataMixin, UpdateView):
+class UpdatePage(PermissionRequiredMixin, DataMixin, UpdateView):
     model = Women
     fields = ['title', 'content', 'photo', 'is_published', 'cat']
     template_name = 'women/addpage.html'
     success_url = reverse_lazy('home')
     title_page = 'Редактирование статьи'
+    permission_required = 'women.change_women'
+    # permission_required- указываем разрешения, в данном случае пеорвле это приложение, затем действи change(редактировать)
+    # и указываем куда -> таблица women
 
 
+@permission_required(perm='women.add_women', raise_exception=True)
+# @permission_required- декоратор для разрешения прав доступа в функциях представления
+# raise_exception=True для отображения forbidden 403
 def contact(request):
     return HttpResponse('Обратная связь')
 
